@@ -108,9 +108,10 @@ public class GoogleDistanceAPI {
         }
     }
     private String generateDirectionsUrl(LatLng origin, LatLng dest,String api) {
-        return "json?" + "origin=" + origin.latitude + "," + origin.longitude + "&" +
+        String url = "json?" + "origin=" + origin.latitude + "," + origin.longitude + "&" +
                 "destination=" + dest.latitude + "," + dest.longitude + "&" +
                 "sensor=false" + "&key=" +
                 api;
+        return url;
     }
 }
