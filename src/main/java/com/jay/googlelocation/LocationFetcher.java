@@ -39,7 +39,7 @@ import com.jay.googlelocation.Globle.Constants;
 /**
  * Created by lg on 8/25/2016.
  */
-public class LocationFetcher extends AppCompatActivity implements GoogleApiClient.ConnectionCallbacks, GoogleApiClient.OnConnectionFailedListener, LocationListener {
+public class LocationFetcher extends Activity implements GoogleApiClient.ConnectionCallbacks, GoogleApiClient.OnConnectionFailedListener, LocationListener {
     private final int MY_PERMISSIONS_REQUEST_LOCATION = 0;
     private final int LOCATION_DIALOG_REQUEST_CODE = 1;
     private final long UPDATE_INTERVAL_IN_MILLISECONDS = 10000;
@@ -97,8 +97,8 @@ public class LocationFetcher extends AppCompatActivity implements GoogleApiClien
                 WindowManager.LayoutParams.FLAG_FULLSCREEN);
         super.onCreate(savedInstanceState);
 
-        LinearLayout linearLayout = new LinearLayout(LocationFetcher.this);
-        setContentView(linearLayout);
+//        LinearLayout linearLayout = new LinearLayout(LocationFetcher.this);
+//        setContentView(linearLayout);
         init();
         buildGoogleApiClient();
     }
@@ -106,7 +106,6 @@ public class LocationFetcher extends AppCompatActivity implements GoogleApiClien
 
     private void init() {
         type = getIntent().getIntExtra(Constants.TYPE, 0);
-        Log.e("Type", ";-" + type);
         mContext = getApplicationContext();
 
         permissions = new String[]{Manifest.permission.ACCESS_FINE_LOCATION};
@@ -160,13 +159,6 @@ public class LocationFetcher extends AppCompatActivity implements GoogleApiClien
     private void getLocation() {
         if (type == Constants.LOCATION_FETCH) {
             if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
-                // TODO: Consider calling
-                //    ActivityCompat#requestPermissions
-                // here to request the missing permissions, and then overriding
-                //   public void onRequestPermissionsResult(int requestCode, String[] permissions,
-                //                                          int[] grantResults)
-                // to handle the case where the user grants the permission. See the documentation
-                // for ActivityCompat#requestPermissions for more details.
                 return;
             }
             mLastLocation = LocationServices.FusedLocationApi.getLastLocation(
@@ -175,7 +167,7 @@ public class LocationFetcher extends AppCompatActivity implements GoogleApiClien
                 userLat = mLastLocation.getLatitude();
                 userLng = mLastLocation.getLongitude();
 
-                rplyLocDetails();
+                rplyLocDetails(Constants.GRANTED);
             }
             else {
                 LocationServices.FusedLocationApi.requestLocationUpdates(mGoogleApiClient, mLocationRequest, new LocationListener() {
@@ -183,7 +175,7 @@ public class LocationFetcher extends AppCompatActivity implements GoogleApiClien
                     public void onLocationChanged(Location location) {
                         userLat = location.getLatitude();
                         userLng = location.getLongitude();
-                        rplyLocDetails();
+                        rplyLocDetails(Constants.GRANTED);
                         LocationServices.FusedLocationApi.removeLocationUpdates(mGoogleApiClient, this);
                         finish();
                     }
@@ -213,8 +205,7 @@ public class LocationFetcher extends AppCompatActivity implements GoogleApiClien
                         Common.alertDialog(LocationFetcher.this, Common.INTERNET_NOT_FOUND_MSG);
                     }
                 } else if (grantResults[0] == PackageManager.PERMISSION_DENIED) {
-                    rplyLocDetails();
-                    Toast.makeText(mContext, "Need to grant location permission!!", Toast.LENGTH_LONG).show();
+                    rplyLocDetails(Constants.DENIED);
                     ActivityCompat.requestPermissions(this, permissions, MY_PERMISSIONS_REQUEST_LOCATION);
                 }
                 break;
@@ -229,25 +220,25 @@ public class LocationFetcher extends AppCompatActivity implements GoogleApiClien
                 if (resultCode == Activity.RESULT_OK) {
                     getLocation();
                 } else {
-                    rplyLocDetails();
+                    rplyLocDetails(Constants.GRANTED);
                 }
                 break;
             case REQUEST_PLACE_PICKER:
                 if (resultCode == Activity.RESULT_OK) {
                     final Place place = PlacePicker.getPlace(data, this);
-                    Log.e("Place",";-"+place);
                     if(place!=null) {
                         LatLng latLng = place.getLatLng();
                         userLat = latLng.latitude;
                         userLng = latLng.longitude;
                     }
                 }
-                rplyLocDetails();
+                rplyLocDetails(Constants.GRANTED);
                 break;
         }
     }
-    private void rplyLocDetails(){
+    private void rplyLocDetails(int permission){
         Intent resultIntent = new Intent();
+        resultIntent.putExtra(Constants.PERMISSION,permission);
         resultIntent.putExtra(Constants.LATITUDE, userLat);
         resultIntent.putExtra(Constants.LONGITUDE, userLng);
         setResult(Activity.RESULT_OK, resultIntent);

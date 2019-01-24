@@ -10,6 +10,10 @@ public class Constants {
     public static final int LOCATION_FETCH=0;
     public static final int LOCATION_PICK=1;
 
+    public static final String PERMISSION="Permission";
+    public static final int GRANTED=1;
+    public static final int DENIED=0;
+
     public static final String LATITUDE="Latitude";
     public static final String LONGITUDE="Longitude";
 
