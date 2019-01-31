@@ -26,16 +26,19 @@ import com.jay.googlelocation.Globle.Constants;
  */
 
 public class LocationService extends Service implements GoogleApiClient.ConnectionCallbacks, GoogleApiClient.OnConnectionFailedListener,LocationListener {
-    private final long UPDATE_INTERVAL_IN_MILLISECONDS = 10000;
+    private final long UPDATE_INTERVAL_IN_MILLISECONDS = 2000;
     private final long FASTEST_UPDATE_INTERVAL_IN_MILLISECONDS = UPDATE_INTERVAL_IN_MILLISECONDS / 2;
 
     public LocationRequest mLocationRequest;
     private LocationSettingsRequest.Builder locationSettingBuilder;
     public GoogleApiClient mGoogleApiClient;
+
+    public interface InterfaceLocationUpdates{
+        void getLocation(double latitude,double longitude);
+    }
     @Override
     public void onCreate() {
         super.onCreate();
-        Log.e("Oncreate","locationservice;-");
         buildGoogleApiClient();
         createLocationRequest();
     }
