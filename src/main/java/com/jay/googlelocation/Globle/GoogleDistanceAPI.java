@@ -70,7 +70,7 @@ public class GoogleDistanceAPI {
 //    }
 
 
-    public void drawRouteOnMapFirstTime(final double lat, final double lng, final double restLat, final double restLong, String api, Context context,final GoogleDistance googleDistanceInterface) {
+    public void getDirectionDetails(final double lat, final double lng, final double restLat, final double restLong, String api, Context context, final GoogleDistance googleDistanceInterface) {
         final GoogleDistance googleDistance= googleDistanceInterface;
 
         Retrofit retrofit = new Retrofit.Builder()
