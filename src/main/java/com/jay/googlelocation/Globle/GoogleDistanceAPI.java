@@ -15,9 +15,9 @@ import retrofit2.Retrofit;
 public class GoogleDistanceAPI {
 
     public interface GoogleDistance {
-        public void onDistanceFetch(String distance);
-        public void onTimingFetch(String time);
-        public void getRoutes(ArrayList<LatLng> route);
+        public void onResult(String distance,String time,ArrayList<LatLng> route);
+//        public void onTimingFetch(String time);
+//        public void getRoutes(ArrayList<LatLng> route);
     }
 
 //    public void getDirectionFromDirectionApiServer(double originLat,double originLng , double destinationLat , double destinationLng, String key,final GoogleDistance googleDistanceInterface) {
@@ -91,10 +91,13 @@ public class GoogleDistanceAPI {
                                 @Override
                                 public void onGetRoute(ArrayList<LatLng> route, String distance, String duration) {
                                     try {
-
-                                        googleDistance.onDistanceFetch(distance);
-                                        googleDistance.onTimingFetch(duration);
-                                        googleDistance.getRoutes(route);
+                                        /*
+                                            Distance - meters
+                                            duration - seconds
+                                         */
+                                        googleDistance.onResult(distance,duration,route);
+//                                        googleDistance.onTimingFetch(duration);
+//                                        googleDistance.getRoutes(route);
 
                                     } catch (Exception e) {
                                         e.printStackTrace();

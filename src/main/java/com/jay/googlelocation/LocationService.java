@@ -8,7 +8,11 @@ import android.app.Service;
 import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
+import android.graphics.Color;
 import android.location.Location;
+import android.media.AudioAttributes;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.IBinder;
@@ -16,7 +20,6 @@ import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.NotificationCompat;
-import android.util.Log;
 
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.api.GoogleApiClient;
@@ -125,14 +128,43 @@ public class LocationService extends Service implements GoogleApiClient.Connecti
             String CHANNEL_ID = "my_service";
             String CHANNEL_NAME = "My Background Service";
 
-            NotificationChannel channel = new NotificationChannel(CHANNEL_ID,
+            NotificationChannel notificationChannel = new NotificationChannel(CHANNEL_ID,
                     CHANNEL_NAME, NotificationManager.IMPORTANCE_NONE);
-            ((NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE)).createNotificationChannel(channel);
+            notificationChannel.enableLights(true);
+            notificationChannel.setLightColor(Color.RED);
+            notificationChannel.enableVibration(true);
+            notificationChannel.setShowBadge(true);
+            AudioAttributes audioAttributes = new AudioAttributes.Builder()
+                    .setContentType(AudioAttributes.CONTENT_TYPE_SONIFICATION)
+                    .setUsage(AudioAttributes.USAGE_NOTIFICATION_RINGTONE)
+                    .build();
+            ((NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE)).createNotificationChannel(notificationChannel);
+
+            NotificationCompat.Builder notificationBuilder = new NotificationCompat.Builder(this);
+            notificationBuilder
+                    .setSmallIcon(getNotificationIcon())
+                    .setLargeIcon(notificationIcon(R.mipmap.ic_launcher))
+                    .setContentTitle(getString(R.string.app_name))
+                    .setAutoCancel(true)
+                    .setVibrate(new long[]{1000, 1000, 1000, 1000})
+                    .setLights(Color.RED, 3000, 3000)
+                    .setVisibility(NotificationCompat.VISIBILITY_PUBLIC)
+                    .setCategory(Notification.CATEGORY_SERVICE)
+                    .setPriority(PRIORITY_MIN);
 
             Notification notification = new NotificationCompat.Builder(this, CHANNEL_ID)
                     .setCategory(Notification.CATEGORY_SERVICE).setSmallIcon(R.mipmap.ic_launcher).setPriority(PRIORITY_MIN).build();
 
             startForeground(101, notification);
         }
+    }
+
+    private int getNotificationIcon() {
+        boolean useWhiteIcon = (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP);
+        return useWhiteIcon ? R.mipmap.ic_rider_top : R.mipmap.ic_launcher;
+    }
+    private Bitmap notificationIcon(int ic_notification_rider) {
+        Bitmap largeIcon = BitmapFactory.decodeResource(getResources(), ic_notification_rider);
+        return largeIcon;
     }
 }
